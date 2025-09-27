@@ -1,0 +1,195 @@
+{% extends "base.html" %}
+{% block title %}History - {{ device.name }}{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="card shadow-lg border-0">
+    <div class="card-header d-flex justify-content-between align-items-center">
+      <h4 class="mb-0">📍 Trip History - <span class="text-primary">{{ device.name }}</span></h4>
+      <span id="modeBadge" class="badge bg-secondary">History Mode</span>
+    </div>
+    <div class="card-body p-0">
+      <div id="map" style="height: 600px; border-radius: 0 0 10px 10px;"></div>
+    </div>
+  </div>
+
+  <!-- Controls -->
+  <div class="text-center mt-4">
+    <div class="btn-group" role="group">
+      <button id="playBtn" class="btn btn-success">
+        <i class="bi bi-play-fill"></i> Play
+      </button>
+      <button id="pauseBtn" class="btn btn-warning">
+        <i class="bi bi-pause-fill"></i> Pause
+      </button>
+      <button id="resetBtn" class="btn btn-secondary">
+        <i class="bi bi-arrow-counterclockwise"></i> Reset
+      </button>
+      <button id="liveToggle" class="btn btn-info">
+        <i class="bi bi-broadcast"></i> Enable Live Mode
+      </button>
+    </div>
+
+    <!-- Speed Control -->
+    <div class="mt-3">
+      <label class="form-label fw-bold">Playback Speed</label>
+      <input type="range" class="form-range" min="0.5" max="5" step="0.5" id="speedControl" value="1">
+      <div><span id="speedValue">1x</span></div>
+    </div>
+    
+    <!-- Download Buttons -->
+    <div class="mt-3 text-center">
+      <a href="{{ url_for('download_csv', device_id=device.id) }}" class="btn btn-outline-primary">
+        <i class="bi bi-file-earmark-spreadsheet"></i> Download CSV
+      </a>
+      <a href="{{ url_for('download_pdf', device_id=device.id) }}" class="btn btn-outline-danger">
+        <i class="bi bi-file-earmark-pdf"></i> Download PDF
+      </a>
+    </div>
+
+
+    <!-- Clear History -->
+    <form method="POST" action="{{ url_for('clear_history', device_id=device.id) }}" class="mt-3">
+      <button type="submit" class="btn btn-danger"
+              onclick="return confirm('Are you sure you want to clear this device\'s trip history?');">
+        <i class="bi bi-trash"></i> Clear History
+      </button>
+    </form>
+  </div>
+</div>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Leaflet Plugins -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.css" />
+<script src="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+<script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+
+<script>
+  const deviceId = {{ device.id }};
+  let map, polyline, marker, path = [], index = 0, interval, isPlaying = false;
+  let lastTimestamp = null;
+  let liveMode = false;
+  let playbackSpeed = 1000;
+
+  // Initialize map
+  map = L.map("map", { fullscreenControl: true }).setView([20.5937, 78.9629], 5);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  // Locate button
+  L.control.locate({ position: "topleft", strings: { title: "Show my location" } }).addTo(map);
+
+  // Custom car icon
+  var carIcon = L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/743/743922.png",
+    iconSize: [35, 35],
+    iconAnchor: [17, 35],
+    popupAnchor: [0, -30]
+  });
+
+  polyline = L.polyline([], { color: "blue" }).addTo(map);
+
+  async function fetchNewPoints() {
+    const res = await fetch(`/api/history/${deviceId}`);
+    const data = await res.json();
+    if (!data.length) return;
+
+    let newPoints = liveMode
+      ? [data[data.length - 1]]
+      : (lastTimestamp ? data.filter(d => new Date(d.timestamp) > new Date(lastTimestamp)) : data);
+
+    if (newPoints.length) {
+      newPoints.forEach(d => {
+        const latlng = [d.latitude, d.longitude];
+        path.push(latlng);
+        polyline.addLatLng(latlng);
+
+        if (!marker) {
+          marker = L.marker(latlng, { icon: carIcon }).addTo(map)
+            .bindPopup(`<strong>{{ device.name }}</strong><br/>Tracking history...`);
+          map.setView(latlng, 14);
+        }
+      });
+      lastTimestamp = newPoints[newPoints.length - 1].timestamp;
+    }
+  }
+
+  function playRoute() {
+    if (!path.length) return;
+    isPlaying = true;
+    clearInterval(interval);
+    interval = setInterval(() => {
+      if (index >= path.length) {
+        fetchNewPoints();
+        return;
+      }
+      marker.setLatLng(path[index]);
+      index++;
+    }, playbackSpeed);
+  }
+
+  function pauseRoute() {
+    isPlaying = false;
+    clearInterval(interval);
+  }
+
+  function resetRoute() {
+    pauseRoute();
+    index = 0;
+    if (marker && path.length) marker.setLatLng(path[0]);
+  }
+
+  // Live toggle
+  document.getElementById("liveToggle").onclick = () => {
+    liveMode = !liveMode;
+    const badge = document.getElementById("modeBadge");
+    document.getElementById("liveToggle").innerHTML = liveMode
+      ? '<i class="bi bi-stop-circle"></i> Disable Live Mode'
+      : '<i class="bi bi-broadcast"></i> Enable Live Mode';
+    badge.className = liveMode ? "badge bg-success" : "badge bg-secondary";
+    badge.innerText = liveMode ? "Live Mode" : "History Mode";
+
+    if (liveMode) {
+      path = [];
+      index = 0;
+      polyline.setLatLngs([]);
+      lastTimestamp = null;
+    }
+  };
+
+  // Speed control
+  document.getElementById("speedControl").oninput = (e) => {
+    const val = e.target.value;
+    playbackSpeed = 1000 / val;
+    document.getElementById("speedValue").innerText = val + "x";
+    if (isPlaying) playRoute();
+  };
+
+  // Buttons
+  document.getElementById("playBtn").onclick = playRoute;
+  document.getElementById("pauseBtn").onclick = pauseRoute;
+  document.getElementById("resetBtn").onclick = resetRoute;
+
+  // Legend
+  var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function () {
+    var div = L.DomUtil.create("div", "card p-2 shadow-sm");
+    div.innerHTML = `
+      <strong>Legend</strong><br>
+      <img src="https://cdn-icons-png.flaticon.com/512/743/743922.png" width="20"> Vehicle<br>
+      🔵 Route
+    `;
+    return div;
+  };
+  legend.addTo(map);
+
+  setInterval(fetchNewPoints, 5000);
+  fetchNewPoints();
+</script>
+{% endblock %}

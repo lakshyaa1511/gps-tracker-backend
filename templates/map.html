@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block title %}Devices Map{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">📍 All Devices</h2>
+
+    <!-- Device Selector -->
+    <div class="d-flex gap-2">
+      <input type="text" id="searchBox" class="form-control" placeholder="🔎 Search device..." style="width: 200px;">
+      <select id="deviceSelector" class="form-select" style="width: 200px;">
+        <option value="">-- Select Device --</option>
+        {% for d in devices %}
+        <option value="{{ d.id }}">{{ d.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+  </div>
+
+  <div id="map" style="height: 600px; border-radius: 10px;"></div>
+</div>
+
+<!-- Leaflet -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+
+<!-- Leaflet Plugins -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.css" />
+<script src="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.js"></script>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
+<script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
+
+<script>
+  var devices = {{ devices|default([])|tojson|safe }};
+
+  var defaultCenter = [20.5937, 78.9629]; // India
+  var map = L.map("map", { fullscreenControl: true }).setView(defaultCenter, 5);
+
+  // Base layer
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    attribution: "&copy; OpenStreetMap contributors"
+  }).addTo(map);
+
+  // Locate button
+  L.control.locate({ position: "topleft", strings: { title: "Show my location" } }).addTo(map);
+
+  // Custom icons
+  var carIcon = L.icon({
+    iconUrl: "https://cdn-icons-png.flaticon.com/512/743/743922.png",
+    iconSize: [35, 35],
+    iconAnchor: [17, 35],
+    popupAnchor: [0, -30]
+  });
+
+  var markers = {};
+
+  function renderDevices() {
+    let bounds = [];
+
+    devices.forEach(d => {
+      if (!d.latitude || !d.longitude) return;
+
+      const latlng = [d.latitude, d.longitude];
+      bounds.push(latlng);
+
+      // Status (online if last update < 60s)
+      let status = "🔴 Offline";
+      if (d.timestamp) {
+        const diff = (new Date() - new Date(d.timestamp)) / 1000;
+        status = diff < 60 ? "🟢 Online" : "🔴 Offline";
+      }
+
+      if (markers[d.id]) {
+        // Smooth animation
+        markers[d.id].slideTo(latlng, { duration: 1000 });
+      } else {
+        markers[d.id] = L.marker(latlng, { icon: carIcon })
+          .addTo(map)
+          .bindPopup(`<strong>${d.name}</strong><br/>Lat: ${latlng[0].toFixed(5)}, Lng: ${latlng[1].toFixed(5)}<br/>Status: ${status}`);
+      }
+    });
+
+    if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
+  }
+
+  // Device selector zoom
+  document.getElementById("deviceSelector").addEventListener("change", e => {
+    const id = e.target.value;
+    const d = devices.find(x => x.id == id);
+    if (d && d.latitude && d.longitude) {
+      map.setView([d.latitude, d.longitude], 15);
+      markers[d.id].openPopup();
+    }
+  });
+
+  // Search by name
+  document.getElementById("searchBox").addEventListener("input", e => {
+    const val = e.target.value.toLowerCase();
+    const found = devices.find(d => d.name.toLowerCase().includes(val));
+    if (found && found.latitude && found.longitude) {
+      map.setView([found.latitude, found.longitude], 15);
+      markers[found.id].openPopup();
+    }
+  });
+
+  // Legend
+  var legend = L.control({ position: "bottomright" });
+  legend.onAdd = function () {
+    var div = L.DomUtil.create("div", "card p-2 shadow-sm");
+    div.innerHTML = `
+      <strong>Legend</strong><br>
+      <img src="https://cdn-icons-png.flaticon.com/512/743/743922.png" width="20"> Vehicle<br>
+      🟢 Online<br>
+      🔴 Offline
+    `;
+    return div;
+  };
+  legend.addTo(map);
+
+  // Initial render
+  renderDevices();
+
+  // Refresh every 5s
+  setInterval(async () => {
+    const res = await fetch("/api/devices");
+    devices = await res.json();
+    renderDevices();
+  }, 5000);
+</script>
+{% endblock %}

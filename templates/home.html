@@ -1,0 +1,11 @@
+home.html
+{% extends "base.html" %}
+{% block content %}
+<div class="text-center">
+    <h1 class="mt-5">Welcome to GPS Tracker</h1>
+    <p class="lead">Track your devices in real time.</p>
+    {% if not logged_in %}
+        <a href="{{ url_for('register') }}" class="btn btn-primary">Get Started</a>
+    {% endif %}
+</div>
+{% endblock %}

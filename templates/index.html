@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>GPS Tracker</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    {% extends "base.html" %}
+
+    {% block title %}Dashboard - GPS Tracker{% endblock %}
+
+    {% block content %}
+    <h1>GPS Tracking Dashboard</h1>
+    <p>Welcome to your GPS tracker system!</p>
+
+    <div id="map" style="height: 850px; width: 100%; margin: auto;"></div>
+
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+    <script>
+        // Initialize the map
+        var map = L.map('map').setView([20.5937, 78.9629], 5); // India default center
+
+        // Add OpenStreetMap tiles
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        // Example marker
+        L.marker([20.5937, 78.9629]).addTo(map)
+            .bindPopup('Sample Device Location')
+            .openPopup();
+        
+
+        let deviceMarker; // global variable for the marker
+
+        function updateLocation() {
+            fetch("/location")
+                .then(response => response.json())
+                .then(data => {
+                    console.log(data);
+
+                    // If marker doesn't exist, create it
+                    if (!deviceMarker) {
+                        deviceMarker = L.marker([data.lat, data.lon]).addTo(map)
+                            .bindPopup("Device last seen at " + data.time);
+                    } else {
+                        // Update marker position
+                        deviceMarker.setLatLng([data.lat, data.lon])
+                            .setPopupContent("Device last seen at " + data.time);
+                    }
+
+                    // Keep map centered on marker
+                    map.setView([data.lat, data.lon], 6);
+                });
+        }
+
+        // Refresh every 5 seconds
+        setInterval(updateLocation, 5000);
+        updateLocation(); // Initial call
+    </script>
+    {% endblock %}
+
+</body>
+</html>

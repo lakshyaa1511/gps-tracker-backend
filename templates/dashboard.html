@@ -1,0 +1,159 @@
+<!-- dashboard.html -->
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<div class="container mt-4">
+
+  <!-- Header with Search -->
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-primary">Your Devices</h2>
+    <div class="d-flex">
+      <input id="searchBar" type="text" class="form-control me-2 shadow-sm"
+             placeholder="🔍 Search devices...">
+      <button class="btn btn-success rounded-3 shadow-sm"
+              data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+        <i class="bi bi-plus-circle"></i> Add Device
+      </button>
+    </div>
+  </div>
+
+  <!-- Devices Grid -->
+  <div class="row" id="devicesGrid">
+    {% for device in devices %}
+    <div class="col-md-4 mb-4 device-card" data-name="{{ device.name|lower }}">
+      <div class="card shadow-sm h-100 border-0 hover-card">
+        <div class="card-body">
+          <!-- Device Name -->
+          <h5 class="card-title">
+            {{ device.name }}
+            {% if device.is_online %}
+              <span class="badge bg-success">● Online</span>
+            {% else %}
+              <span class="badge bg-danger">● Offline</span>
+            {% endif %}
+          </h5>
+
+          <!-- Device Info -->
+          <p class="card-text text-muted mb-1">
+            <i class="bi bi-cpu-fill"></i> ID: {{ device.id }}
+          </p>
+          <p class="card-text text-muted">
+            <i class="bi bi-clock"></i>
+            Last seen: {{ device.last_location.timestamp if device.last_location }}
+          </p>
+
+          <!-- Actions -->
+          <div class="d-flex justify-content-between">
+            <a href="{{ url_for('map_device', device_id=device.id) }}"
+               class="btn btn-sm btn-outline-success"><i class="bi bi-map"></i> Map</a>
+            <a href="{{ url_for('view_history', device_id=device.id) }}"
+               class="btn btn-sm btn-outline-info"><i class="bi bi-clock-history"></i> History</a>
+            <button class="btn btn-sm btn-outline-warning"
+                    data-bs-toggle="modal" data-bs-target="#editDeviceModal{{ device.id }}">
+              <i class="bi bi-pencil-square"></i> Edit
+            </button>
+            <button class="btn btn-sm btn-outline-danger"
+                    data-bs-toggle="modal" data-bs-target="#deleteDeviceModal{{ device.id }}">
+              <i class="bi bi-trash"></i> Delete
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Edit Modal -->
+    <div class="modal fade" id="editDeviceModal{{ device.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('edit_device', device_id=device.id) }}">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title">Edit Device</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <div class="mb-3">
+                <label class="form-label">Device Name</label>
+                <input type="text" class="form-control" name="name" value="{{ device.name }}" required>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-warning">Save</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Delete Modal -->
+    <div class="modal fade" id="deleteDeviceModal{{ device.id }}" tabindex="-1">
+      <div class="modal-dialog">
+        <form method="POST" action="{{ url_for('delete_device', device_id=device.id) }}">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title text-danger">Delete Device</h5>
+              <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+              <p>Are you sure you want to delete <strong>{{ device.name }}</strong>?</p>
+            </div>
+            <div class="modal-footer">
+              <button type="submit" class="btn btn-danger">Delete</button>
+              <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% if not devices %}
+  <div class="alert alert-info text-center shadow-sm">
+    <i class="bi bi-info-circle-fill"></i> No devices yet. Add one using the <b>Add Device</b> button above.
+  </div>
+  {% endif %}
+</div>
+
+<!-- Add Device Modal -->
+<div class="modal fade" id="addDeviceModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('dashboard') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Device</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Device Name</label>
+            <input type="text" class="form-control" name="name" placeholder="Enter device name" required>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Add</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Custom Styling & JS -->
+<style>
+  .hover-card { transition: transform 0.2s, box-shadow 0.2s; }
+  .hover-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 6px 15px rgba(0,0,0,0.2);
+  }
+</style>
+<script>
+  // ✅ Device Search
+  document.getElementById("searchBar").addEventListener("input", function () {
+    let query = this.value.toLowerCase();
+    document.querySelectorAll(".device-card").forEach(card => {
+      card.style.display = card.dataset.name.includes(query) ? "block" : "none";
+    });
+  });
+</script>
+{% endblock %}
