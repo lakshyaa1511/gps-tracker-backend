@@ -1,3 +1,4 @@
+{% set d = None %}
 {% extends "base.html" %}
 {% block title %}Devices Map{% endblock %}
 
@@ -25,7 +26,7 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<!-- Leaflet Plugins -->
+<!-- Plugins -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.css" />
 <script src="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.js"></script>
 
@@ -33,75 +34,99 @@
 <script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
 
 <script>
-  var devices = {{ devices|default([])|tojson|safe }};
-
-  var defaultCenter = [20.5937, 78.9629]; // India
-  var map = L.map("map", { fullscreenControl: true }).setView(defaultCenter, 5);
-
-  // Base layer
+  // Device data from Flask
+  var devices = {{ devices | tojson | safe }};
+  var map = L.map("map", { fullscreenControl: true }).setView([20.5937, 78.9629], 5);
   L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
     attribution: "&copy; OpenStreetMap contributors"
   }).addTo(map);
 
-  // Locate button
   L.control.locate({ position: "topleft", strings: { title: "Show my location" } }).addTo(map);
 
-  // Custom icons
-  var carIcon = L.icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/743/743922.png",
-    iconSize: [35, 35],
-    iconAnchor: [17, 35],
-    popupAnchor: [0, -30]
-  });
+  // Custom icons for each type
+  const icons = {
+    car: L.icon({
+      iconUrl: "/static/icons/icons8-car-96.gif",
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -30]
+    }),
+    bike: L.icon({
+      iconUrl: "/static/icons/motorcycle.gif",
+      iconSize: [40, 40],
+      iconAnchor: [20, 40],
+      popupAnchor: [0, -30]
+    }),
+    truck: L.icon({
+      iconUrl: "/static/icons/icons8-truck-96.gif",
+      iconSize: [45, 45],
+      iconAnchor: [22, 45],
+      popupAnchor: [0, -35]
+    }),
+    default: L.icon({
+      iconUrl: "https://cdn-icons-png.flaticon.com/512/743/743922.png",
+      iconSize: [35, 35],
+      iconAnchor: [17, 35],
+      popupAnchor: [0, -30]
+    })
+  };
 
   var markers = {};
+
+  function getDeviceIcon(type) {
+    if (!type) return icons.default;
+    type = type.toLowerCase();
+    if (type.includes("car")) return icons.car;
+    if (type.includes("bike") || type.includes("motor")) return icons.bike;
+    if (type.includes("truck")) return icons.truck;
+    return icons.default;
+  }
 
   function renderDevices() {
     let bounds = [];
 
-    devices.forEach(d => {
-      if (!d.latitude || !d.longitude) return;
+    devices.forEach(device => {
+      if (!device.latitude || !device.longitude) return;
 
-      const latlng = [d.latitude, d.longitude];
+      const latlng = [device.latitude, device.longitude];
       bounds.push(latlng);
 
-      // Status (online if last update < 60s)
-      let status = "🔴 Offline";
-      if (d.timestamp) {
-        const diff = (new Date() - new Date(d.timestamp)) / 1000;
-        status = diff < 60 ? "🟢 Online" : "🔴 Offline";
-      }
+      const diff = (new Date() - new Date(device.timestamp)) / 1000;
+      const status = diff < 60 ? "🟢 Online" : "🔴 Offline";
 
-      if (markers[d.id]) {
-        // Smooth animation
-        markers[d.id].slideTo(latlng, { duration: 1000 });
+      if (markers[device.id]) {
+        markers[device.id].setLatLng(latlng);
       } else {
-        markers[d.id] = L.marker(latlng, { icon: carIcon })
-          .addTo(map)
-          .bindPopup(`<strong>${d.name}</strong><br/>Lat: ${latlng[0].toFixed(5)}, Lng: ${latlng[1].toFixed(5)}<br/>Status: ${status}`);
+        const icon = getDeviceIcon(device.type);
+        markers[device.id] = L.marker(latlng, { icon }).addTo(map)
+          .bindPopup(`
+            <strong>${device.name}</strong><br>
+            Type: ${device.type || "Unknown"}<br>
+            Lat: ${latlng[0].toFixed(5)}, Lng: ${latlng[1].toFixed(5)}<br>
+            Status: ${status}
+          `);
       }
     });
 
     if (bounds.length) map.fitBounds(bounds, { padding: [50, 50] });
   }
 
-  // Device selector zoom
+  // Search & zoom to device
   document.getElementById("deviceSelector").addEventListener("change", e => {
     const id = e.target.value;
-    const d = devices.find(x => x.id == id);
-    if (d && d.latitude && d.longitude) {
-      map.setView([d.latitude, d.longitude], 15);
-      markers[d.id].openPopup();
+    const device = devices.find(x => x.id == id);
+    if (device && device.latitude && device.longitude) {
+      map.setView([device.latitude, device.longitude], 15);
+      markers[device.id]?.openPopup();
     }
   });
 
-  // Search by name
   document.getElementById("searchBox").addEventListener("input", e => {
     const val = e.target.value.toLowerCase();
     const found = devices.find(d => d.name.toLowerCase().includes(val));
     if (found && found.latitude && found.longitude) {
       map.setView([found.latitude, found.longitude], 15);
-      markers[found.id].openPopup();
+      markers[found.id]?.openPopup();
     }
   });
 
@@ -111,7 +136,9 @@
     var div = L.DomUtil.create("div", "card p-2 shadow-sm");
     div.innerHTML = `
       <strong>Legend</strong><br>
-      <img src="https://cdn-icons-png.flaticon.com/512/743/743922.png" width="20"> Vehicle<br>
+      <img src="/static/icons/icons8-car-96.gif" width="25"> Car<br>
+      <img src="/static/icons/motorcycle.gif" width="25"> Bike<br>
+      <img src="/static/icons/icons8-truck-96.gif" width="25"> Truck<br>
       🟢 Online<br>
       🔴 Offline
     `;
@@ -122,7 +149,7 @@
   // Initial render
   renderDevices();
 
-  // Refresh every 5s
+  // Refresh every 5 seconds
   setInterval(async () => {
     const res = await fetch("/api/devices");
     devices = await res.json();

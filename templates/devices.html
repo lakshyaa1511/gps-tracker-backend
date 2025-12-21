@@ -6,11 +6,12 @@
   <div class="d-flex justify-content-between align-items-center mb-4">
     <h2 class="fw-bold text-primary animate__animated animate__fadeInLeft">Your Devices</h2>
     <div class="d-flex">
-      <input id="searchBar" type="text" class="form-control me-2 shadow-sm"
-             placeholder="🔍 Search devices...">
-      <a href="{{ url_for('dashboard') }}" class="btn btn-success rounded-3 animate__animated animate__fadeInRight">
-        + Add Device
-      </a>
+      <input id="searchBar" type="text" class="form-control me-2 shadow-sm" placeholder="🔍 Search devices...">
+      <!-- ✅ Corrected button spelling and modal trigger -->
+      <button class="btn btn-success rounded-3 animate__animated animate__fadeInRight"
+              data-bs-toggle="modal" data-bs-target="#addDeviceModal">
+        <i class="bi bi-plus-circle"></i> Add Device
+      </button>
     </div>
   </div>
 
@@ -21,17 +22,15 @@
           <tr>
             <th scope="col">Name</th>
             <th scope="col">Device ID</th>
-            <th scope="col">Status</th>   <!-- 🔹 Added -->
+            <th scope="col">Status</th>
             <th scope="col" class="text-center">Actions</th>
           </tr>
         </thead>
         <tbody>
           {% for device in devices %}
-          <tr class="animate__animated animate__fadeInUp">
+          <tr class="animate__animated animate__fadeInUp" data-name="{{ device.name|lower }}">
             <td class="fw-bold text-dark">{{ device.name }}</td>
             <td class="text-muted">{{ device.id }}</td>
-
-            <!-- 🔹 New Status Column -->
             <td>
               {% if device.is_online %}
                 <span class="badge bg-success">● Online</span>
@@ -39,18 +38,13 @@
                 <span class="badge bg-danger">● Offline</span>
               {% endif %}
             </td>
-
             <td class="text-center">
-              <a href="{{ url_for('map_device', device_id=device.id) }}" 
-                class="btn btn-sm btn-outline-success">Map</a>
-              <a href="{{ url_for('view_history', device_id=device.id) }}" 
-                class="btn btn-sm btn-outline-info">History</a>
-              <a href="{{ url_for('edit_device', device_id=device.id) }}" 
-                class="btn btn-sm btn-outline-warning rounded-3 px-3 me-1">
+              <a href="{{ url_for('map_device', device_id=device.id) }}" class="btn btn-sm btn-outline-success">Map</a>
+              <a href="{{ url_for('view_history', device_id=device.id) }}" class="btn btn-sm btn-outline-info">History</a>
+              <a href="{{ url_for('edit_device', device_id=device.id) }}" class="btn btn-sm btn-outline-warning rounded-3 px-3 me-1">
                 <i class="bi bi-pencil-square"></i> Edit
               </a>
-              <form action="{{ url_for('delete_device', device_id=device.id) }}" 
-                    method="POST" style="display:inline;">
+              <form action="{{ url_for('delete_device', device_id=device.id) }}" method="POST" style="display:inline;">
                 <button type="submit" class="btn btn-sm btn-outline-danger rounded-3 px-3"
                         onclick="return confirm('Are you sure you want to delete this device?');">
                   <i class="bi bi-trash-fill"></i> Delete
@@ -60,13 +54,50 @@
           </tr>
           {% endfor %}
         </tbody>
+      </table>
     </div>
   {% else %}
     <div class="alert alert-info text-center shadow-sm animate__animated animate__fadeIn">
-      <i class="bi bi-info-circle-fill"></i> No devices found.  
-      Add one from your <a href="{{ url_for('dashboard') }}" class="fw-bold text-primary">Dashboard</a>.
+      <i class="bi bi-info-circle-fill"></i> No devices found.
+      Add one using the <b>Add Device</b> button above.
     </div>
   {% endif %}
+</div>
+
+<!-- ✅ Add Device Modal -->
+<div class="modal fade" id="addDeviceModal" tabindex="-1">
+  <div class="modal-dialog">
+    <form method="POST" action="{{ url_for('add_device') }}">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Add Device</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label class="form-label">Device Name</label>
+            <input type="text" class="form-control" name="device_name" placeholder="Enter device name" required>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Device IMEI</label>
+            <input type="text" class="form-control" name="device_imei" placeholder="Enter IMEI number" required>
+          </div>
+          <div class="mb-3">
+    		<label for="device_type" class="form-label">Vehicle Type</label>
+    		<select name="device_type" id="device_type" class="form-select" required>
+          		<option value="car">Car 🚗</option>
+			<option value="bike">Bike 🏍️</option>
+		        <option value="truck">Truck 🚚</option>
+    		</select>
+ 	  </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-success">Add Device</button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        </div>
+      </div>
+    </form>
+  </div>
 </div>
 
 <!-- JS for Search -->

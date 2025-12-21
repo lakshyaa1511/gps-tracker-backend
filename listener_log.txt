@@ -1,0 +1,162 @@
+[2025-10-07 09:53:42] Listening for GPS devices on 0.0.0.0:5001 ...
+[2025-10-07 09:54:01] Device connected from ('117.228.57.144', 41753)
+[2025-10-07 09:54:02] 📡 Login from IMEI=357803371000775
+[2025-10-07 09:54:02] ✅ Sent ACK (proto=1)
+[2025-10-07 09:54:03] GPS parse failed: time data '20190a07093602' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:04] GPS parse failed: time data '20190a060b2810' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:05] GPS parse failed: time data '20190a060b2822' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:06] GPS parse failed: time data '20190a060b282e' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:07] GPS parse failed: time data '20190a060b2908' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:08] GPS parse failed: time data '20190a060b2912' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:09] GPS parse failed: time data '20190a060b291a' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:10] GPS parse failed: time data '20190a060b292c' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:11] GPS parse failed: time data '20190a060b2a00' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:12] 💓 Heartbeat received.
+[2025-10-07 09:54:12] ✅ Sent ACK (proto=19)
+[2025-10-07 09:54:17] GPS parse failed: time data '20190a060b2a16' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:17] GPS parse failed: time data '20190a060b2a28' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:21] GPS parse failed: time data '20190a060b2a36' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:21] GPS parse failed: time data '20190a060b2b0c' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:21] GPS parse failed: time data '20190a060b2b26' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:21] GPS parse failed: time data '20190a060b2b34' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:22] GPS parse failed: time data '20190a060b2b38' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:23] GPS parse failed: time data '20190a060b2c17' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:24] 💓 Heartbeat received.
+[2025-10-07 09:54:24] ✅ Sent ACK (proto=19)
+[2025-10-07 09:54:29] GPS parse failed: time data '20190a060b2c33' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:29] GPS parse failed: time data '20190a060b2d03' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:30] GPS parse failed: time data '20190a060b2d13' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:31] GPS parse failed: time data '20190a060b2d19' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:32] GPS parse failed: time data '20190a060b2d1f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:33] GPS parse failed: time data '20190a060b2d23' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:34] GPS parse failed: time data '20190a060b2d27' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:35] GPS parse failed: time data '20190a060b2d29' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:36] 💓 Heartbeat received.
+[2025-10-07 09:54:36] ✅ Sent ACK (proto=19)
+[2025-10-07 09:54:41] GPS parse failed: time data '20190a060b2d2b' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:42] GPS parse failed: time data '20190a060b2d2d' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:42] GPS parse failed: time data '20190a060b2d2f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:54:43] GPS parse failed: time data '20190a060b2d39' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:56:53] GPS parse failed: time data '20190a060b2d3b' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:56:53] GPS parse failed: time data '20190a060b2e11' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:56:53] 💓 Heartbeat received.
+[2025-10-07 09:56:53] ✅ Sent ACK (proto=19)
+[2025-10-07 09:56:53] GPS parse failed: time data '20190a060b2e1d' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:56:53] GPS parse failed: time data '20190a060c1116' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:56:53] GPS parse failed: time data '20190a060c1437' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:56:53] GPS parse failed: time data '20190a060c1501' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:56:54] 💓 Heartbeat received.
+[2025-10-07 09:56:54] ✅ Sent ACK (proto=19)
+[2025-10-07 09:56:54] Device ('117.228.57.144', 41753) disconnected.
+[2025-10-07 09:57:00] Device connected from ('117.228.57.144', 41795)
+[2025-10-07 09:57:00] 📡 Login from IMEI=357803371000775
+[2025-10-07 09:57:00] ✅ Sent ACK (proto=1)
+[2025-10-07 09:57:01] GPS parse failed: time data '20190a060c1503' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:02] GPS parse failed: time data '20190a060c1517' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:03] GPS parse failed: time data '20190a060c151f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:04] GPS parse failed: time data '20190a060c1525' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:05] GPS parse failed: time data '20190a060c1529' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:06] GPS parse failed: time data '20190a060c1539' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:08] GPS parse failed: time data '20190a060c1609' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:08] GPS parse failed: time data '20190a060c1615' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:09] 💓 Heartbeat received.
+[2025-10-07 09:57:09] ✅ Sent ACK (proto=19)
+[2025-10-07 09:57:14] GPS parse failed: time data '20190a060c161f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:14] GPS parse failed: time data '20190a060c162b' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:15] GPS parse failed: time data '20190a060c1635' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:16] GPS parse failed: time data '20190a060c1703' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:17] GPS parse failed: time data '20190a060c1713' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:18] GPS parse failed: time data '20190a060c1721' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:19] GPS parse failed: time data '20190a060c172d' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:20] GPS parse failed: time data '20190a060c1739' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:21] 💓 Heartbeat received.
+[2025-10-07 09:57:21] ✅ Sent ACK (proto=19)
+[2025-10-07 09:57:27] GPS parse failed: time data '20190a060c1926' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:27] GPS parse failed: time data '20190a060c1932' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:29] GPS parse failed: time data '20190a060c1a02' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:31] GPS parse failed: time data '20190a060c1a0e' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:31] GPS parse failed: time data '20190a060c1a1a' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:31] GPS parse failed: time data '20190a060c1a1e' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:32] GPS parse failed: time data '20190a060c1a20' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:33] GPS parse failed: time data '20190a060c1a22' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:34] 💓 Heartbeat received.
+[2025-10-07 09:57:34] ✅ Sent ACK (proto=19)
+[2025-10-07 09:57:39] GPS parse failed: time data '20190a060c1a28' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:40] GPS parse failed: time data '20190a060c1a34' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:42] GPS parse failed: time data '20190a060c1b04' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:42] GPS parse failed: time data '20190a060c1b0e' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:43] GPS parse failed: time data '20190a060c1b1a' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:47] GPS parse failed: time data '20190a060c1b26' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:47] GPS parse failed: time data '20190a060c1b30' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:47] GPS parse failed: time data '20190a060c1c00' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:47] 💓 Heartbeat received.
+[2025-10-07 09:57:47] ✅ Sent ACK (proto=19)
+[2025-10-07 09:57:52] GPS parse failed: time data '20190a060c1c0c' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:53] GPS parse failed: time data '20190a060c1c16' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:54] GPS parse failed: time data '20190a060c1c20' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:54] GPS parse failed: time data '20190a060c1c2a' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:55] GPS parse failed: time data '20190a060c1c34' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:56] GPS parse failed: time data '20190a060c1d02' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:57] GPS parse failed: time data '20190a060c1d0c' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:58] GPS parse failed: time data '20190a060c1d1a' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:57:59] 💓 Heartbeat received.
+[2025-10-07 09:57:59] ✅ Sent ACK (proto=19)
+[2025-10-07 09:58:03] GPS parse failed: time data '20190a060c1d2a' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:04] GPS parse failed: time data '20190a060c1e00' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:06] GPS parse failed: time data '20190a060c2211' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:07] GPS parse failed: time data '20190a060c221d' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:07] GPS parse failed: time data '20190a060c2229' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:08] GPS parse failed: time data '20190a060c2237' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:09] GPS parse failed: time data '20190a060c2305' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:10] GPS parse failed: time data '20190a060c2309' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:11] 💓 Heartbeat received.
+[2025-10-07 09:58:11] ✅ Sent ACK (proto=19)
+[2025-10-07 09:58:16] GPS parse failed: time data '20190a060c230b' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:18] GPS parse failed: time data '20190a060c230f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:20] GPS parse failed: time data '20190a060c231d' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:20] GPS parse failed: time data '20190a060c231f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:22] GPS parse failed: time data '20190a060c2321' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:22] GPS parse failed: time data '20190a060c2329' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:23] GPS parse failed: time data '20190a060c232f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:25] GPS parse failed: time data '20190a060c2336' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:26] 💓 Heartbeat received.
+[2025-10-07 09:58:26] ✅ Sent ACK (proto=19)
+[2025-10-07 09:58:31] GPS parse failed: time data '20190a060c2404' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:31] GPS parse failed: time data '20190a060c2512' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:32] GPS parse failed: time data '20190a060c2516' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:32] GPS parse failed: time data '20190a060c2520' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:33] GPS parse failed: time data '20190a060c252a' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:34] GPS parse failed: time data '20190a060c2536' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:36] GPS parse failed: time data '20190a060c2604' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:37] GPS parse failed: time data '20190a060c260e' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:37] 💓 Heartbeat received.
+[2025-10-07 09:58:37] ✅ Sent ACK (proto=19)
+[2025-10-07 09:58:42] GPS parse failed: time data '20190a060c2618' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:43] GPS parse failed: time data '20190a060c2622' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:44] GPS parse failed: time data '20190a060c262c' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:48] GPS parse failed: time data '20190a060c2636' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:48] GPS parse failed: time data '20190a060c2704' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:52] GPS parse failed: time data '20190a060c270e' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:52] GPS parse failed: time data '20190a060c2722' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:53] 💓 Heartbeat received.
+[2025-10-07 09:58:53] ✅ Sent ACK (proto=19)
+[2025-10-07 09:58:58] GPS parse failed: time data '20190a060c272c' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:58] GPS parse failed: time data '20190a060c2736' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:58:59] GPS parse failed: time data '20190a060c280f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:00] GPS parse failed: time data '20190a060c281b' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:00] GPS parse failed: time data '20190a060c2827' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:01] GPS parse failed: time data '20190a060c282f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:02] GPS parse failed: time data '20190a060c2839' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:04] GPS parse failed: time data '20190a060c2907' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:05] 💓 Heartbeat received.
+[2025-10-07 09:59:05] ✅ Sent ACK (proto=19)
+[2025-10-07 09:59:09] GPS parse failed: time data '20190a060c290f' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:10] GPS parse failed: time data '20190a060c2911' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:11] GPS parse failed: time data '20190a060c2915' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:12] GPS parse failed: time data '20190a060c2925' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:13] GPS parse failed: time data '20190a060c2927' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:14] GPS parse failed: time data '20190a060c292d' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:15] GPS parse failed: time data '20190a060c2a05' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:16] GPS parse failed: time data '20190a060c2a0d' does not match format '%Y%m%d%H%M%S'
+[2025-10-07 09:59:17] 💓 Heartbeat received.
+[2025-10-07 09:59:17] ✅ Sent ACK (proto=19)

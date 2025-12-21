@@ -2,6 +2,31 @@
 {% block title %}History - {{ device.name }}{% endblock %}
 
 {% block content %}
+
+<div class="card p-3 shadow-sm mb-3">
+  <div class="row g-2 align-items-end">
+    <div class="col-md-3">
+      <label class="form-label fw-bold">From</label>
+      <input type="datetime-local" id="fromTime" class="form-control">
+    </div>
+    <div class="col-md-3">
+      <label class="form-label fw-bold">To</label>
+      <input type="datetime-local" id="toTime" class="form-control">
+    </div>
+    <div class="col-md-4">
+      <button id="filterBtn" class="btn btn-primary w-100">
+        <i class="bi bi-filter-circle"></i> Apply Filter
+      </button>
+    </div>
+  </div>
+  <div class="mt-2 text-center">
+    <button class="btn btn-outline-secondary btn-sm quick-range" data-range="1h">Last 1 Hour</button>
+    <button class="btn btn-outline-secondary btn-sm quick-range" data-range="6h">Last 6 Hours</button>
+    <button class="btn btn-outline-secondary btn-sm quick-range" data-range="24h">Last 24 Hours</button>
+    <button class="btn btn-outline-secondary btn-sm quick-range" data-range="today">Today</button>
+  </div>
+</div>
+
 <div class="container mt-4">
   <div class="card shadow-lg border-0">
     <div class="card-header d-flex justify-content-between align-items-center">
@@ -13,183 +38,172 @@
     </div>
   </div>
 
-  <!-- Controls -->
-  <div class="text-center mt-4">
-    <div class="btn-group" role="group">
-      <button id="playBtn" class="btn btn-success">
-        <i class="bi bi-play-fill"></i> Play
-      </button>
-      <button id="pauseBtn" class="btn btn-warning">
-        <i class="bi bi-pause-fill"></i> Pause
-      </button>
-      <button id="resetBtn" class="btn btn-secondary">
-        <i class="bi bi-arrow-counterclockwise"></i> Reset
-      </button>
-      <button id="liveToggle" class="btn btn-info">
-        <i class="bi bi-broadcast"></i> Enable Live Mode
-      </button>
-    </div>
-
-    <!-- Speed Control -->
-    <div class="mt-3">
-      <label class="form-label fw-bold">Playback Speed</label>
-      <input type="range" class="form-range" min="0.5" max="5" step="0.5" id="speedControl" value="1">
-      <div><span id="speedValue">1x</span></div>
-    </div>
-    
-    <!-- Download Buttons -->
-    <div class="mt-3 text-center">
-      <a href="{{ url_for('download_csv', device_id=device.id) }}" class="btn btn-outline-primary">
-        <i class="bi bi-file-earmark-spreadsheet"></i> Download CSV
-      </a>
-      <a href="{{ url_for('download_pdf', device_id=device.id) }}" class="btn btn-outline-danger">
-        <i class="bi bi-file-earmark-pdf"></i> Download PDF
-      </a>
-    </div>
-
-
-    <!-- Clear History -->
-    <form method="POST" action="{{ url_for('clear_history', device_id=device.id) }}" class="mt-3">
-      <button type="submit" class="btn btn-danger"
-              onclick="return confirm('Are you sure you want to clear this device\'s trip history?');">
-        <i class="bi bi-trash"></i> Clear History
-      </button>
-    </form>
+  <div class="text-center mt-3">
+    <button id="liveToggle" class="btn btn-info">
+      <i class="bi bi-broadcast"></i> Enable Live Mode
+    </button>
   </div>
 </div>
 
-<!-- Leaflet -->
 <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
 <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
-<!-- Leaflet Plugins -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.css" />
-<script src="https://unpkg.com/leaflet.fullscreen/Control.FullScreen.js"></script>
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.css" />
-<script src="https://unpkg.com/leaflet.locatecontrol/dist/L.Control.Locate.min.js"></script>
-
 <script>
   const deviceId = {{ device.id }};
-  let map, polyline, marker, path = [], index = 0, interval, isPlaying = false;
-  let lastTimestamp = null;
+  let map = L.map("map").setView([20.5937, 78.9629], 5);
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
+
+  const icons = {
+    car: L.icon({ iconUrl: "/static/icons/icons8-car-96.gif", iconSize: [45, 45], iconAnchor: [22, 45] }),
+    truck: L.icon({ iconUrl: "/static/icons/icons8-truck-96.gif", iconSize: [45, 45], iconAnchor: [22, 45] }),
+    bike: L.icon({ iconUrl: "/static/icons/motorcycle.gif", iconSize: [45, 45], iconAnchor: [22, 45] })
+  };
+  const icon = icons["{{ device.type or 'car' }}".toLowerCase()] || icons.car;
+
+  let polyline = L.polyline([], { color: "blue" }).addTo(map);
+  let marker = null;
   let liveMode = false;
-  let playbackSpeed = 1000;
 
-  // Initialize map
-  map = L.map("map", { fullscreenControl: true }).setView([20.5937, 78.9629], 5);
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    attribution: "&copy; OpenStreetMap contributors"
-  }).addTo(map);
+  // === Function: Fetch filtered data ===
+  async function fetchFilteredHistory(from, to) {
+    const params = new URLSearchParams();
+    if (from) params.append("from", from);
+    if (to) params.append("to", to);
 
-  // Locate button
-  L.control.locate({ position: "topleft", strings: { title: "Show my location" } }).addTo(map);
+    const res = await fetch(`/api/history/${deviceId}?${params.toString()}`);
+    return await res.json();
+  }
 
-  // Custom car icon
-  var carIcon = L.icon({
-    iconUrl: "https://cdn-icons-png.flaticon.com/512/743/743922.png",
-    iconSize: [35, 35],
-    iconAnchor: [17, 35],
-    popupAnchor: [0, -30]
-  });
-
-  polyline = L.polyline([], { color: "blue" }).addTo(map);
-
-  async function fetchNewPoints() {
-    const res = await fetch(`/api/history/${deviceId}`);
-    const data = await res.json();
+  // === Function: Update map based on data ===
+  function renderPath(data) {
     if (!data.length) return;
 
-    let newPoints = liveMode
-      ? [data[data.length - 1]]
-      : (lastTimestamp ? data.filter(d => new Date(d.timestamp) > new Date(lastTimestamp)) : data);
+    polyline.setLatLngs(data.map(d => [d.latitude, d.longitude]));
+    const last = data[data.length - 1];
+    const latlng = [last.latitude, last.longitude];
 
-    if (newPoints.length) {
-      newPoints.forEach(d => {
-        const latlng = [d.latitude, d.longitude];
-        path.push(latlng);
-        polyline.addLatLng(latlng);
-
-        if (!marker) {
-          marker = L.marker(latlng, { icon: carIcon }).addTo(map)
-            .bindPopup(`<strong>{{ device.name }}</strong><br/>Tracking history...`);
-          map.setView(latlng, 14);
-        }
-      });
-      lastTimestamp = newPoints[newPoints.length - 1].timestamp;
+    if (!marker) {
+      marker = L.marker(latlng, { icon }).addTo(map);
+      map.setView(latlng, 14);
+    } else {
+      marker.setLatLng(latlng);
     }
   }
 
-  function playRoute() {
-    if (!path.length) return;
-    isPlaying = true;
-    clearInterval(interval);
-    interval = setInterval(() => {
-      if (index >= path.length) {
-        fetchNewPoints();
-        return;
-      }
-      marker.setLatLng(path[index]);
-      index++;
-    }, playbackSpeed);
-  }
+  // === Filter button ===
+  document.getElementById("filterBtn").onclick = async () => {
+    const from = document.getElementById("fromTime").value;
+    const to = document.getElementById("toTime").value;
+    const data = await fetchFilteredHistory(from, to);
+    renderPath(data);
+  };
 
-  function pauseRoute() {
-    isPlaying = false;
-    clearInterval(interval);
-  }
+  // === Quick range buttons ===
+  document.querySelectorAll(".quick-range").forEach(btn => {
+    btn.onclick = async () => {
+      const range = btn.dataset.range;
+      const now = new Date();
+      let from = new Date(now);
+      if (range === "1h") from.setHours(now.getHours() - 1);
+      else if (range === "6h") from.setHours(now.getHours() - 6);
+      else if (range === "24h") from.setHours(now.getHours() - 24);
+      else if (range === "today") from.setHours(0, 0, 0, 0);
 
-  function resetRoute() {
-    pauseRoute();
-    index = 0;
-    if (marker && path.length) marker.setLatLng(path[0]);
-  }
+      const data = await fetchFilteredHistory(from.toISOString(), now.toISOString());
+      renderPath(data);
+    };
+  });
 
-  // Live toggle
+  // === Live toggle ===
   document.getElementById("liveToggle").onclick = () => {
     liveMode = !liveMode;
     const badge = document.getElementById("modeBadge");
-    document.getElementById("liveToggle").innerHTML = liveMode
-      ? '<i class="bi bi-stop-circle"></i> Disable Live Mode'
-      : '<i class="bi bi-broadcast"></i> Enable Live Mode';
-    badge.className = liveMode ? "badge bg-success" : "badge bg-secondary";
-    badge.innerText = liveMode ? "Live Mode" : "History Mode";
-
+    const btn = document.getElementById("liveToggle");
     if (liveMode) {
-      path = [];
-      index = 0;
-      polyline.setLatLngs([]);
-      lastTimestamp = null;
+      badge.className = "badge bg-success";
+      badge.textContent = "Live Mode";
+      btn.innerHTML = '<i class="bi bi-stop-circle"></i> Disable Live Mode';
+      updateMap();
+    } else {
+      badge.className = "badge bg-secondary";
+      badge.textContent = "History Mode";
+      btn.innerHTML = '<i class="bi bi-broadcast"></i> Enable Live Mode';
     }
   };
 
-  // Speed control
-  document.getElementById("speedControl").oninput = (e) => {
-    const val = e.target.value;
-    playbackSpeed = 1000 / val;
-    document.getElementById("speedValue").innerText = val + "x";
-    if (isPlaying) playRoute();
-  };
+  // === Live updater ===
 
-  // Buttons
-  document.getElementById("playBtn").onclick = playRoute;
-  document.getElementById("pauseBtn").onclick = pauseRoute;
-  document.getElementById("resetBtn").onclick = resetRoute;
+async function updateMap() {
+  const fromTime = document.getElementById("fromTime")?.value || "";
+  const toTime = document.getElementById("toTime")?.value || "";
 
-  // Legend
-  var legend = L.control({ position: "bottomright" });
-  legend.onAdd = function () {
-    var div = L.DomUtil.create("div", "card p-2 shadow-sm");
-    div.innerHTML = `
-      <strong>Legend</strong><br>
-      <img src="https://cdn-icons-png.flaticon.com/512/743/743922.png" width="20"> Vehicle<br>
-      🔵 Route
-    `;
-    return div;
-  };
-  legend.addTo(map);
+  const query = new URLSearchParams();
+  if (fromTime) query.append("from", fromTime);
+  if (toTime) query.append("to", toTime);
 
-  setInterval(fetchNewPoints, 5000);
-  fetchNewPoints();
+  const res = await fetch(`/api/history/${deviceId}?${query.toString()}`);
+  const data = await res.json();
+
+  // Reset map visuals
+  polyline.setLatLngs([]);
+  if (marker) map.removeLayer(marker);
+
+  if (!data || !data.length) {
+    console.warn("No data returned from API");
+    return;
+  }
+
+  // Use all valid points
+  const coords = data
+    .map(d => [parseFloat(d.latitude), parseFloat(d.longitude)])
+    .filter(([lat, lon]) =>
+      !isNaN(lat) && !isNaN(lon) &&
+      lat >= -90 && lat <= 90 &&
+      lon >= -180 && lon <= 180
+    );
+
+  if (coords.length < 2) {
+    console.warn(`⚠️ Only ${coords.length} points available — drawing single marker`);
+    if (coords.length === 1) {
+      marker = L.marker(coords[0], { icon }).addTo(map);
+      map.setView(coords[0], 15);
+    }
+    return;
+  }
+
+  // Draw line & marker
+  polyline.setLatLngs(coords);
+  const last = coords[coords.length - 1];
+  marker = L.marker(last, { icon }).addTo(map);
+  map.fitBounds(polyline.getBounds(), { padding: [50, 50] });
+}
+
+
+// Helper: Haversine distance
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  const R = 6371;
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  return R * c;
+}
+
+
+document.getElementById("filterBtn").addEventListener("click", updateMap);
+
+  setInterval(() => { if (liveMode) updateMap(); }, 3000);
+
+  // Initial load (last 6h by default)
+  (async () => {
+    const now = new Date();
+    const from = new Date(now);
+    from.setHours(now.getHours() - 6);
+    const data = await fetchFilteredHistory(from.toISOString(), now.toISOString());
+    renderPath(data);
+  })();
 </script>
 {% endblock %}

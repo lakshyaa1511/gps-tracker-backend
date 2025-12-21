@@ -17,6 +17,41 @@
     </div>
   </div>
 
+<h3>Traccar devices</h3>
+{% if traccar_devices %}
+<table class="table">
+  <thead>
+    <tr><th>Name</th><th>UniqueId</th><th>Status</th><th>Last Update</th><th>Linked</th><th>Action</th></tr>
+  </thead>
+  <tbody>
+  {% for d in traccar_devices %}
+    <tr>
+      <td>{{ d.name }}</td>
+      <td>{{ d.uniqueId }}</td>
+      <td>{{ d.status or "unknown" }}</td>
+      <td>{{ d.lastUpdate or "-" }}</td>
+      <td>{% if d.linked %}✅ linked{% else %}—{% endif %}</td>
+      <td>
+        {% if not d.linked %}
+        <form method="post" action="{{ url_for('link_traccar_device') }}">
+          <input type="hidden" name="traccar_id" value="{{ d.traccar_id }}">
+          <input type="hidden" name="uniqueId" value="{{ d.uniqueId }}">
+          <input type="hidden" name="name" value="{{ d.name }}">
+          <button class="btn btn-sm btn-primary" type="submit">Link</button>
+        </form>
+        {% else %}
+        <a class="btn btn-sm btn-secondary" href="{{ url_for('map_device', device_id=d.linked_device_id) }}">View</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+{% else %}
+  <p>No Traccar devices found or could not fetch them.</p>
+{% endif %}
+
+
   <!-- Devices Grid -->
   <div class="row" id="devicesGrid">
     {% for device in devices %}
@@ -74,6 +109,12 @@
               <div class="mb-3">
                 <label class="form-label">Device Name</label>
                 <input type="text" class="form-control" name="name" value="{{ device.name }}" required>
+		<label for="type">Vehicle Type</label>
+		  <select name="type" id="type">
+		    <option value="car" {% if device.type == 'car' %}selected{% endif %}>Car</option>
+		    <option value="bike" {% if device.type == 'bike' %}selected{% endif %}>Bike</option>
+		    <option value="truck" {% if device.type == 'truck' %}selected{% endif %}>Truck</option>
+		  </select>
               </div>
             </div>
             <div class="modal-footer">
@@ -118,17 +159,29 @@
 <!-- Add Device Modal -->
 <div class="modal fade" id="addDeviceModal" tabindex="-1">
   <div class="modal-dialog">
-    <form method="POST" action="{{ url_for('dashboard') }}">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title">Add Device</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+    <form method="POST" action="{{ url_for('add_device') }}">
+      <div class="modal-content shadow">
+        <div class="modal-header bg-success text-white">
+          <h5 class="modal-title"><i class="bi bi-plus-circle"></i>Add Device</h5>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="mb-3">
             <label class="form-label">Device Name</label>
-            <input type="text" class="form-control" name="name" placeholder="Enter device name" required>
+            <input type="text" class="form-control" name="device_name" placeholder="Enter device name" required>
           </div>
+          <div class="mb-3">
+            <label class="form-label">Device IMEI</label>
+            <input type="text" class="form-control" name="device_imei" placeholder="Enter 15-degit IMEI" maxlength="15" required>
+          </div>
+	   <div class="mb-3">
+    		<label for="device_type" class="form-label">Vehicle Type</label>
+    		<select name="device_type" id="device_type" class="form-select" required>
+   		   <option value="car">Car 🚗</option>
+   		   <option value="bike">Bike 🏍️</option>
+   		   <option value="truck">Truck 🚚</option>
+    		</select>
+  	   </div>
         </div>
         <div class="modal-footer">
           <button type="submit" class="btn btn-success">Add</button>
